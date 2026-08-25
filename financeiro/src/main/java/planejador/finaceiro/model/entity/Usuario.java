@@ -1,4 +1,5 @@
 package planejador.finaceiro.model.entity;
 
 public class Usuario {
+    private String nome;
 }
