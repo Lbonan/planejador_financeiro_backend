@@ -35,5 +35,12 @@ public class TransacaoResponseDTO {
         this.data = transacao.getData();
         this.tipoTransacao = transacao.getTipoTransacao();
         this.statusTransacao = transacao.getStatusTransacao();
+
+        if (transacao.getCategoria() != null) {
+            this.categoria = new CategoriaResponseDTO(transacao.getCategoria());
+        }
+        if (transacao.getConta() != null) {
+            this.conta = new ContaResponseDTO(transacao.getConta());
+        }
     }
 }
