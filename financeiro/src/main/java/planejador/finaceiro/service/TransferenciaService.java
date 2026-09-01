@@ -10,6 +10,8 @@ import planejador.finaceiro.model.repository.ContaRepository;
 import planejador.finaceiro.model.repository.TransferenciaRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +19,19 @@ public class TransferenciaService {
 
     private final TransferenciaRepository transferenciaRepository;
     private final ContaRepository contaRepository;
+
+    public List<TransferenciaResponseDTO> listarTodas() {
+        return transferenciaRepository.findAll()
+                .stream()
+                .map(TransferenciaResponseDTO::new)
+                .toList();
+    }
+
+    public TransferenciaResponseDTO buscarPorId(UUID id) {
+        Transferencia transferencia = transferenciaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Transferência não encontrada com ID: " + id));
+        return new TransferenciaResponseDTO(transferencia);
+    }
 
     public TransferenciaResponseDTO transferir(TransferenciaRequestDTO dto) {
         if (dto.getContaOrigemId().equals(dto.getContaDestinoId())) {
