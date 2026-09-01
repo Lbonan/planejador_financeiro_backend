@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class UsuarioResponseDTO {
 
-    private Long id;
+    private UUID id;
     private String nome;
     private String email;
     private LocalDateTime criadoEm;
