@@ -27,7 +27,7 @@ public class ContaService {
         conta.setNome(dto.getNome());
         conta.setBanco(dto.getBanco());
         conta.setTipoConta(dto.getTipoConta());
-        conta.setSaldoInicial(dto.getSaldoInicial());
+        conta.setSaldo(dto.getSaldo());
         conta.setUsuario(usuario);
 
         Conta salva = contaRepository.save(conta);
@@ -49,7 +49,7 @@ public class ContaService {
         conta.setNome(dto.getNome());
         conta.setBanco(dto.getBanco());
         conta.setTipoConta(dto.getTipoConta());
-        conta.setSaldoInicial(dto.getSaldoInicial());
+        conta.setSaldo(dto.getSaldo());
 
         Conta atualizada = contaRepository.save(conta);
         return toResponseDTO(atualizada);

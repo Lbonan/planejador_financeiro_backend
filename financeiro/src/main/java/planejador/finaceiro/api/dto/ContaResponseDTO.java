@@ -14,7 +14,7 @@ public class ContaResponseDTO {
     private String nome;
     private String banco;
     private TipoConta tipoConta;
-    private BigDecimal saldoInicial;
+    private BigDecimal saldo;
     private LocalDateTime criadoEm;
     private LocalDateTime atualizadoEm;
 
@@ -23,7 +23,7 @@ public class ContaResponseDTO {
         this.nome = conta.getNome();
         this.banco = conta.getBanco();
         this.tipoConta = conta.getTipoConta();
-        this.saldoInicial = conta.getSaldoInicial();
+        this.saldo = conta.getSaldo();
         this.criadoEm = conta.getCriadoEm();
         this.atualizadoEm = conta.getAtualizadoEm();
     }

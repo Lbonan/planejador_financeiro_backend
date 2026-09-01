@@ -30,7 +30,7 @@ public class Conta {
    private TipoConta tipoConta;
 
    @Column(name = "saldo_inicial")
-   private BigDecimal saldoInicial;
+   private BigDecimal saldo;
 
    @Column(name = "criado_em")
    private LocalDateTime criadoEm;

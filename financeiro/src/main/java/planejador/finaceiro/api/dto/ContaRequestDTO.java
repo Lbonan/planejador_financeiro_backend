@@ -20,5 +20,5 @@ public class ContaRequestDTO {
     @NotNull(message = "Tipo é obrigatório")
     private TipoConta tipoConta;
 
-    private BigDecimal saldoInicial;
+    private BigDecimal saldo;
 }
