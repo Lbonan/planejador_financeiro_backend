@@ -7,6 +7,7 @@ import planejador.finaceiro.model.entity.Usuario;
 import planejador.finaceiro.model.repository.UsuarioRepository;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class UsuarioService {
@@ -34,7 +35,7 @@ public class UsuarioService {
         return converterParaResponse(usuarioSalvo);
     }
 
-    public UsuarioResponseDTO buscarPorId(Long id) {
+    public UsuarioResponseDTO buscarPorId(UUID id) {
 
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
@@ -50,7 +51,7 @@ public class UsuarioService {
                 .toList();
     }
 
-    public UsuarioResponseDTO atualizar(Long id, UsuarioRequestDTO dto) {
+    public UsuarioResponseDTO atualizar(UUID id, UsuarioRequestDTO dto) {
 
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
@@ -64,7 +65,7 @@ public class UsuarioService {
         return converterParaResponse(usuarioAtualizado);
     }
 
-    public void excluir(Long id) {
+    public void excluir(UUID id) {
 
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));

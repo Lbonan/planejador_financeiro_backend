@@ -8,6 +8,7 @@ import planejador.finaceiro.api.dto.UsuarioResponseDTO;
 import planejador.finaceiro.service.UsuarioService;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/usuarios")
@@ -38,14 +39,14 @@ public class UsuarioController {
 
     @GetMapping("/{id}")
     public ResponseEntity<UsuarioResponseDTO> buscarPorId(
-            @PathVariable Long id) {
+            @PathVariable UUID id) {
 
         return ResponseEntity.ok(usuarioService.buscarPorId(id));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<UsuarioResponseDTO> atualizar(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @RequestBody UsuarioRequestDTO dto) {
 
         return ResponseEntity.ok(usuarioService.atualizar(id, dto));
@@ -53,7 +54,7 @@ public class UsuarioController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(
-            @PathVariable Long id) {
+            @PathVariable UUID id) {
 
         usuarioService.excluir(id);
 
