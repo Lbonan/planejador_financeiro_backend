@@ -1,4 +1,4 @@
-package planejador.financeiro.model.entity;
+package planejador.finaceiro.model.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -46,15 +46,11 @@ public class Usuario {
     @OneToMany(mappedBy = "usuario")
     private List<Categoria> categorias = new ArrayList<>();
 
-    @OneToMany(mappedBy = "usuario")
+    /*@OneToMany(mappedBy = "usuario")
     private List<Meta> metas = new ArrayList<>();
 
     @OneToMany(mappedBy = "usuario")
-    private List<Cartao> cartoes = new ArrayList<>();
-
-    @OneToMany(mappedBy = "usuario")
-    private List<Transferencia> transferencias = new ArrayList<>();
-
+    private List<Cartao> cartoes = new ArrayList<>();*/
 
     @PrePersist
     public void prePersist() {
