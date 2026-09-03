@@ -1,8 +1,10 @@
 package planejador.finaceiro.service;
 
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import planejador.finaceiro.api.dto.ContaRequestDTO;
 import planejador.finaceiro.api.dto.ContaResponseDTO;
 import planejador.finaceiro.exceptions.RecursoNaoEncontradoException;
 import planejador.finaceiro.model.entity.Conta;
@@ -10,6 +12,7 @@ import planejador.finaceiro.model.entity.Usuario;
 import planejador.finaceiro.model.repository.ContaRepository;
 import planejador.finaceiro.model.repository.UsuarioRepository;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -19,7 +22,7 @@ public class ContaService {
     private final UsuarioRepository usuarioRepository;
 
 
-    public ContaResponseDTO criarConta(ContaResponseDTO dto, UUID usuarioId){
+    public ContaResponseDTO criarConta(ContaRequestDTO dto, UUID usuarioId){
         Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário com id " + usuarioId + "não encontrado"));
 
@@ -35,6 +38,12 @@ public class ContaService {
 
     }
 
+    public List<ContaResponseDTO> listarPorUsuario(UUID usuarioId){
+        return contaRepository.findByUsuarioId(usuarioId).stream()
+                .map(this::toResponseDTO)
+                .collect(Collectors.toList());
+    }
+
     public ContaResponseDTO buscarPorId(UUID id) {
         Conta conta = contaRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Conta com id " + id + "não encontrado"));
@@ -42,7 +51,7 @@ public class ContaService {
     }
 
 
-    public ContaResponseDTO atualizarConta(ContaResponseDTO dto, UUID id){
+    public ContaResponseDTO atualizarConta(ContaRequestDTO dto, UUID id){
         Conta conta = contaRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Conta com id" + id + "não encontrado"));
 
