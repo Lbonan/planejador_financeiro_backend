@@ -82,7 +82,7 @@ public class ContaController {
             @ApiResponse(responseCode = "204", description = "Conta removida com sucesso"),
             @ApiResponse(responseCode = "404", description = "Conta não encontrada")
     })
-    public ResponseEntity<ContaResponseDTO> deletar(@PathVariable UUID id) {
+    public ResponseEntity<Void> deletar(@PathVariable UUID id) {
         contaService.deletarConta(id);
         return ResponseEntity.noContent().build();
     }
