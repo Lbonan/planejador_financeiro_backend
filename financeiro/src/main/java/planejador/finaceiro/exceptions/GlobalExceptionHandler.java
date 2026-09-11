@@ -13,7 +13,6 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-
     // erros validação do @valid
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidacao(MethodArgumentNotValidException ex){
@@ -23,12 +22,17 @@ public class GlobalExceptionHandler {
         Map<String, Object> corpo = corpoBaseEx(HttpStatus.BAD_REQUEST, "Erro de validação");
         corpo.put("campos", camposComErro);
         return ResponseEntity.badRequest().body(corpo);
-
     }
 
     @ExceptionHandler(RecursoNaoEncontradoException.class)
     public ResponseEntity<Map<String, Object>> handleNaoEncontrado(RecursoNaoEncontradoException ex){
         Map<String, Object> corpo = corpoBaseEx(HttpStatus.NOT_FOUND, ex.getMessage());
+        return ResponseEntity.badRequest().body(corpo);
+    }
+
+    @ExceptionHandler(SaldoInsuficienteException.class)
+    public ResponseEntity<Map<String, Object>> handleSaldoInsuficiente(SaldoInsuficienteException ex){
+        Map<String, Object> corpo = corpoBaseEx(HttpStatus.BAD_REQUEST, ex.getMessage());
         return ResponseEntity.badRequest().body(corpo);
     }
 
@@ -54,4 +58,3 @@ public class GlobalExceptionHandler {
         return corpo;
     }
 }
-

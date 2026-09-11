@@ -50,6 +50,20 @@ public class TransferenciaController {
         return ResponseEntity.ok(transferencia);
     }
 
+    @GetMapping("/conta/{contaId}")
+    @Operation(
+            summary = "Listar transferências por conta",
+            description = "Retorna todas as transferências em que a conta informada participou como origem ou como destino."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Lista de transferências recuperada com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Conta não encontrada")
+    })
+    public ResponseEntity<List<TransferenciaResponseDTO>> listarPorConta(@PathVariable UUID contaId) {
+        List<TransferenciaResponseDTO> transferencias = transferenciaService.listarPorConta(contaId);
+        return ResponseEntity.ok(transferencias);
+    }
+
     @PostMapping
     @Operation(
             summary = "Realizar transferência",
