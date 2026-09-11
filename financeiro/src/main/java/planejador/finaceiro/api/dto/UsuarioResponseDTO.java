@@ -16,9 +16,13 @@ import java.util.UUID;
 public class UsuarioResponseDTO {
 
     private UUID id;
+
     private String nome;
+
     private String email;
+
     private LocalDateTime criadoEm;
+
     private LocalDateTime atualizadoEm;
 
     public UsuarioResponseDTO(Usuario usuario) {
