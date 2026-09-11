@@ -44,6 +44,30 @@ public class TransacaoController {
         return ResponseEntity.ok(transacao);
     }
 
+    @GetMapping("/usuario/{usuarioId}")
+    @Operation(
+            summary = "Listar transações por usuário",
+            description = "Retorna o extrato completo de transações vinculadas a todas as contas de um usuário."
+    )
+    public ResponseEntity<List<TransacaoResponseDTO>> listarPorUsuario(@PathVariable UUID usuarioId) {
+        List<TransacaoResponseDTO> transacoes = transacaoService.listarPorUsuario(usuarioId);
+        return ResponseEntity.ok(transacoes);
+    }
+
+    @GetMapping("/conta/{contaId}")
+    @Operation(
+            summary = "Listar transações por conta",
+            description = "Retorna o histórico de transações vinculadas a uma conta específica."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Lista de transações recuperada com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Conta não encontrada")
+    })
+    public ResponseEntity<List<TransacaoResponseDTO>> listarPorConta(@PathVariable UUID contaId) {
+        List<TransacaoResponseDTO> transacoes = transacaoService.listarPorConta(contaId);
+        return ResponseEntity.ok(transacoes);
+    }
+
     @PostMapping
     @Operation(
             summary = "Criar nova transação",

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import planejador.finaceiro.api.dto.TransacaoRequestDTO;
 import planejador.finaceiro.api.dto.TransacaoResponseDTO;
+import planejador.finaceiro.exceptions.RecursoNaoEncontradoException;
 import planejador.finaceiro.model.entity.Categoria;
 import planejador.finaceiro.model.entity.Conta;
 import planejador.finaceiro.model.entity.TipoTransacao;
@@ -11,6 +12,7 @@ import planejador.finaceiro.model.entity.Transacao;
 import planejador.finaceiro.model.repository.CategoriaRepository;
 import planejador.finaceiro.model.repository.ContaRepository;
 import planejador.finaceiro.model.repository.TransacaoRepository;
+import planejador.finaceiro.model.repository.UsuarioRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,6 +25,7 @@ public class TransacaoService {
     private final TransacaoRepository transacaoRepository;
     private final ContaRepository contaRepository;
     private final CategoriaRepository categoriaRepository;
+    private final UsuarioRepository usuarioRepository;
 
     public List<TransacaoResponseDTO> listarTodas() {
         return transacaoRepository.findAll()
@@ -33,16 +36,38 @@ public class TransacaoService {
 
     public TransacaoResponseDTO buscarPorId(UUID id) {
         Transacao transacao = transacaoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Transação não encontrada com ID: " + id));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Transação não encontrada com ID: " + id));
         return new TransacaoResponseDTO(transacao);
+    }
+
+    public List<TransacaoResponseDTO> listarPorUsuario(UUID usuarioId) {
+        if (!usuarioRepository.existsById(usuarioId)) {
+            throw new RecursoNaoEncontradoException("Usuário não encontrado com ID: " + usuarioId);
+        }
+
+        return transacaoRepository.buscarTodasPorUsuarioId(usuarioId)
+                .stream()
+                .map(TransacaoResponseDTO::new)
+                .toList();
+    }
+
+    public List<TransacaoResponseDTO> listarPorConta(UUID contaId) {
+        if (!contaRepository.existsById(contaId)) {
+            throw new RecursoNaoEncontradoException("Conta não encontrada com ID: " + contaId);
+        }
+
+        return transacaoRepository.findByContaIdContaOrderByDataDesc(contaId)
+                .stream()
+                .map(TransacaoResponseDTO::new)
+                .toList();
     }
 
     public TransacaoResponseDTO criarTransacao(TransacaoRequestDTO dto) {
         Conta conta = contaRepository.findById(dto.getContaId())
-                .orElseThrow(() -> new RuntimeException("Conta não encontrada."));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Conta não encontrada."));
 
         Categoria categoria = categoriaRepository.findById(dto.getCategoriaId())
-                .orElseThrow(() -> new RuntimeException("Categoria não encontrada."));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Categoria não encontrada."));
 
         Transacao transacao = new Transacao();
         transacao.setValor(dto.getValor());
@@ -59,7 +84,7 @@ public class TransacaoService {
 
     public void deletar(UUID id) {
         if (!transacaoRepository.existsById(id)) {
-            throw new RuntimeException("Transação não encontrada.");
+            throw new RecursoNaoEncontradoException("Transação não encontrada.");
         }
         transacaoRepository.deleteById(id);
     }
