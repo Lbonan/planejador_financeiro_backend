@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import planejador.finaceiro.api.dto.TransferenciaRequestDTO;
 import planejador.finaceiro.api.dto.TransferenciaResponseDTO;
+import planejador.finaceiro.exceptions.RecursoNaoEncontradoException;
+import planejador.finaceiro.exceptions.SaldoInsuficienteException;
 import planejador.finaceiro.model.entity.Conta;
 import planejador.finaceiro.model.entity.Transferencia;
 import planejador.finaceiro.model.repository.ContaRepository;
@@ -29,8 +31,15 @@ public class TransferenciaService {
 
     public TransferenciaResponseDTO buscarPorId(UUID id) {
         Transferencia transferencia = transferenciaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Transferência não encontrada com ID: " + id));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Transferência não encontrada com ID: " + id));
         return new TransferenciaResponseDTO(transferencia);
+    }
+
+    public List<TransferenciaResponseDTO> listarPorConta(UUID contaId) {
+        return transferenciaRepository.buscarPorConta(contaId)
+                .stream()
+                .map(TransferenciaResponseDTO::new)
+                .toList();
     }
 
     public TransferenciaResponseDTO transferir(TransferenciaRequestDTO dto) {
@@ -39,13 +48,13 @@ public class TransferenciaService {
         }
 
         Conta contaOrigem = contaRepository.findById(dto.getContaOrigemId())
-                .orElseThrow(() -> new RuntimeException("Conta de origem não encontrada."));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Conta de origem não encontrada."));
 
         Conta contaDestino = contaRepository.findById(dto.getContaDestinoId())
-                .orElseThrow(() -> new RuntimeException("Conta de destino não encontrada."));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Conta de destino não encontrada."));
 
         if (contaOrigem.getSaldo().compareTo(dto.getValor()) < 0) {
-            throw new RuntimeException("Saldo insuficiente na conta de origem para realizar a transferência.");
+            throw new SaldoInsuficienteException("Saldo insuficiente na conta de origem para realizar a transferência.");
         }
 
         contaOrigem.setSaldo(contaOrigem.getSaldo().subtract(dto.getValor()));
