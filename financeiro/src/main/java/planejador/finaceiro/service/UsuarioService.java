@@ -3,6 +3,7 @@ package planejador.finaceiro.service;
 import org.springframework.stereotype.Service;
 import planejador.finaceiro.api.dto.UsuarioRequestDTO;
 import planejador.finaceiro.api.dto.UsuarioResponseDTO;
+import planejador.finaceiro.exceptions.RecursoNaoEncontradoException;
 import planejador.finaceiro.model.entity.Usuario;
 import planejador.finaceiro.model.repository.UsuarioRepository;
 
@@ -21,7 +22,7 @@ public class UsuarioService {
     public UsuarioResponseDTO criar(UsuarioRequestDTO dto) {
 
         if (usuarioRepository.existsByEmail(dto.getEmail())) {
-            throw new RuntimeException("E-mail já cadastrado");
+            throw new RuntimeException("Já existe um usuário cadastrado com esse e-mail.");
         }
 
         Usuario usuario = new Usuario();
@@ -38,7 +39,7 @@ public class UsuarioService {
     public UsuarioResponseDTO buscarPorId(UUID id) {
 
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado."));
 
         return converterParaResponse(usuario);
     }
@@ -54,7 +55,7 @@ public class UsuarioService {
     public UsuarioResponseDTO atualizar(UUID id, UsuarioRequestDTO dto) {
 
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado."));
 
         usuario.setNome(dto.getNome());
         usuario.setEmail(dto.getEmail());
@@ -68,7 +69,7 @@ public class UsuarioService {
     public void excluir(UUID id) {
 
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado."));
 
         usuarioRepository.delete(usuario);
     }
