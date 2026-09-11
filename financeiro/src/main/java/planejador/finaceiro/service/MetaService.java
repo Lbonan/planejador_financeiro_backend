@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import planejador.finaceiro.api.dto.MetaRequestDTO;
 import planejador.finaceiro.api.dto.MetaResponseDTO;
+import planejador.finaceiro.exceptions.RecursoNaoEncontradoException;
 import planejador.finaceiro.model.entity.Meta;
 import planejador.finaceiro.model.entity.StatusMeta;
 import planejador.finaceiro.model.entity.Usuario;
@@ -23,7 +24,7 @@ public class MetaService {
 
     public List<MetaResponseDTO> listarPorUsuario(UUID usuarioId) {
         if (!usuarioRepository.existsById(usuarioId)) {
-            throw new RuntimeException("Usuário não encontrado com ID: " + usuarioId);
+            throw new RecursoNaoEncontradoException("Usuário não encontrado com ID: " + usuarioId);
         }
         return metaRepository.findByUsuarioId(usuarioId)
                 .stream()
@@ -33,13 +34,13 @@ public class MetaService {
 
     public MetaResponseDTO buscarPorId(UUID metaId) {
         Meta meta = metaRepository.findById(metaId)
-                .orElseThrow(() -> new RuntimeException("Meta não encontrada com ID: " + metaId));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Meta não encontrada com ID: " + metaId));
         return new MetaResponseDTO(meta);
     }
 
     public MetaResponseDTO criar(MetaRequestDTO dto) {
         Usuario usuario = usuarioRepository.findById(dto.getUsuarioId())
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado com ID: " + dto.getUsuarioId()));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado com ID: " + dto.getUsuarioId()));
 
         Meta meta = new Meta();
         meta.setNome(dto.getNome());
@@ -62,7 +63,7 @@ public class MetaService {
         }
 
         Meta meta = metaRepository.findById(metaId)
-                .orElseThrow(() -> new RuntimeException("Meta não encontrada com ID: " + metaId));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Meta não encontrada com ID: " + metaId));
 
         if (meta.getStatusMeta() != StatusMeta.EM_ANDAMENTO) {
             throw new IllegalStateException("Aportes só podem ser feitos em metas com status EM_ANDAMENTO.");
@@ -81,7 +82,7 @@ public class MetaService {
 
     public void deletar(UUID metaId) {
         if (!metaRepository.existsById(metaId)) {
-            throw new RuntimeException("Meta não encontrada com ID: " + metaId);
+            throw new RecursoNaoEncontradoException("Meta não encontrada com ID: " + metaId);
         }
         metaRepository.deleteById(metaId);
     }
