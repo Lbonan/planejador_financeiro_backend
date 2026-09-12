@@ -11,14 +11,11 @@ import java.util.UUID;
 
 @Repository
 public interface TransacaoRepository extends JpaRepository<Transacao, UUID> {
-    @Query("""
-        SELECT t FROM Transacao t 
-        JOIN t.conta c 
-        JOIN c.usuario u 
-        WHERE u.id = :usuarioId 
-        ORDER BY t.data DESC
-    """)
-    List<Transacao> buscarTodasPorUsuarioId(@Param("usuarioId") UUID usuarioId);
 
-    List<Transacao> findByContaIdContaOrderByDataDesc(UUID contaId);
+    @Query("SELECT t FROM Transacao t WHERE t.conta.id = :contaId ORDER BY t.data DESC")
+    List<Transacao> listarPorContaId(@Param("contaId") UUID contaId);
+
+
+    @Query("SELECT t FROM Transacao t WHERE t.conta.usuario.id = :usuarioId ORDER BY t.data DESC")
+    List<Transacao> listarPorUsuarioId(@Param("usuarioId") UUID usuarioId);
 }

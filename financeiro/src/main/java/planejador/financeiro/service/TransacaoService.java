@@ -44,7 +44,7 @@ public class TransacaoService {
             throw new RecursoNaoEncontradoException("Usuário não encontrado com ID: " + usuarioId);
         }
 
-        return transacaoRepository.buscarTodasPorUsuarioId(usuarioId)
+        return transacaoRepository.listarPorUsuarioId(usuarioId)
                 .stream()
                 .map(TransacaoResponseDTO::new)
                 .toList();
@@ -55,7 +55,7 @@ public class TransacaoService {
             throw new RecursoNaoEncontradoException("Conta não encontrada com ID: " + contaId);
         }
 
-        return transacaoRepository.findByContaIdContaOrderByDataDesc(contaId)
+        return transacaoRepository.listarPorContaId(contaId)
                 .stream()
                 .map(TransacaoResponseDTO::new)
                 .toList();

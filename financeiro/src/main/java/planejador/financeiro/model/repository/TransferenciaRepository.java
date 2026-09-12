@@ -11,6 +11,10 @@ import java.util.UUID;
 
 @Repository
 public interface TransferenciaRepository extends JpaRepository<Transferencia, UUID> {
-    @Query("SELECT t FROM Transferencia t WHERE t.contaOrigem.idConta = :contaId OR t.contaDestino.idConta = :contaId")
+    @Query("""
+        SELECT t FROM Transferencia t 
+        WHERE t.contaOrigem.id = :contaId OR t.contaDestino.id = :contaId 
+        ORDER BY t.dataTransferencia DESC
+    """)
     List<Transferencia> buscarPorConta(@Param("contaId") UUID contaId);
 }
