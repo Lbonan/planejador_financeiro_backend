@@ -34,7 +34,7 @@ public class Usuario {
     @Column(nullable = false)
     private String senha;
 
-    @Column(name = "criado_em", nullable = false, updatable = false)
+    @Column(name = "criado_em")
     private LocalDateTime criadoEm;
 
     @Column(name = "atualizado_em")
