@@ -6,7 +6,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import planejador.financeiro.api.dto.ContaRequestDTO;
 import planejador.financeiro.api.dto.ContaResponseDTO;
+import planejador.financeiro.security.UsuarioDetailsImpl;
 import planejador.financeiro.service.ContaService;
 
 import java.util.List;
@@ -41,15 +44,16 @@ public class ContaController {
     })
     public ResponseEntity<ContaResponseDTO> criar(
             @RequestBody @Valid ContaRequestDTO dto,
-            @RequestParam UUID usuarioId) {
-        return ResponseEntity.status(201).body(contaService.criarConta(dto, usuarioId));
+            @AuthenticationPrincipal UsuarioDetailsImpl usuarioLogado) {
+        UUID usuarioId = usuarioLogado.getUsuario().getId();
+        return ResponseEntity.status(HttpStatus.CREATED).body(contaService.criarConta(dto, usuarioId));
     }
 
     @GetMapping
     @Operation(summary = "Listar contas do usuário", description = "Retorna todas as contas cadastradas para um usuário específico.")
     @ApiResponse(responseCode = "200", description = "Lista recuperada com sucesso")
-    public ResponseEntity<List<ContaResponseDTO>> listar(@RequestParam UUID usuarioId) {
-        return ResponseEntity.ok(contaService.listarPorUsuario(usuarioId));
+    public ResponseEntity<List<ContaResponseDTO>> listar(@AuthenticationPrincipal UsuarioDetailsImpl usuarioLogado) {
+        return ResponseEntity.ok(contaService.listarPorUsuario(usuarioLogado.getUsuario().getId()));
     }
 
     @GetMapping("/{id}")

@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import planejador.financeiro.api.dto.CategoriaRequestDTO;
 import planejador.financeiro.api.dto.CategoriaResponseDTO;
+import planejador.financeiro.security.UsuarioDetailsImpl;
 import planejador.financeiro.service.CategoriaService;
 
 import java.util.List;
@@ -35,8 +37,8 @@ public class CategoriaController {
   @GetMapping
   @Operation(summary = "Listar categorias do usuário", description = "Retorna todas as categorias cadastradas para um usuário específico.")
   @ApiResponse(responseCode = "200", description = "Lista recuperada com sucesso")
-  public ResponseEntity<List<CategoriaResponseDTO>> listar(@PathVariable UUID id) {
-      return ResponseEntity.ok(categoriaService.listar(id));
+  public ResponseEntity<List<CategoriaResponseDTO>> listar(@AuthenticationPrincipal UsuarioDetailsImpl usuarioLogado) {
+      return ResponseEntity.ok(categoriaService.listar(usuarioLogado.getUsuario().getId()));
   }
 
   @GetMapping("/{id}")
@@ -58,8 +60,9 @@ public class CategoriaController {
   })
   public ResponseEntity<CategoriaResponseDTO> criar(
           @RequestBody @Valid CategoriaRequestDTO dto,
-          @PathVariable UUID id
+          @AuthenticationPrincipal UsuarioDetailsImpl usuarioLogado
           ){
+      UUID id = usuarioLogado.getUsuario().getId();
       return ResponseEntity.status(HttpStatus.CREATED).body(categoriaService.criar(dto, id));
   }
 
@@ -74,7 +77,7 @@ public class CategoriaController {
           @PathVariable UUID id,
           @RequestBody @Valid CategoriaRequestDTO dto
   ) {
-      return ResponseEntity.ok(categoriaService.atualizar(id, dto));
+    return ResponseEntity.ok(categoriaService.atualizar(id, dto));
   }
 
   @DeleteMapping

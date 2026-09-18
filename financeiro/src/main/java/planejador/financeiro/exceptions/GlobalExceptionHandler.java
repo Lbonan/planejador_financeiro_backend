@@ -50,6 +50,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(corpo);
     }
 
+    @ExceptionHandler(org.springframework.security.core.AuthenticationException.class)
+    public ResponseEntity<Map<String, Object>> handleAutenticacao(org.springframework.security.core.AuthenticationException ex) {
+        Map<String, Object> corpo = corpoBaseEx(HttpStatus.UNAUTHORIZED, "E-mail ou senha inválidos");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(corpo);
+    }
+
     private Map<String, Object> corpoBaseEx(HttpStatus status, String mensagem){
         Map<String, Object> corpo = new HashMap<>();
         corpo.put("timestamp", LocalDateTime.now());
