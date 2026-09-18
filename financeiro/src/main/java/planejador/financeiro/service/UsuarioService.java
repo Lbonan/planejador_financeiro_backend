@@ -1,5 +1,7 @@
 package planejador.financeiro.service;
 
+import lombok.Setter;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import planejador.financeiro.api.dto.UsuarioRequestDTO;
 import planejador.financeiro.api.dto.UsuarioResponseDTO;
@@ -11,12 +13,15 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Setter
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsuarioService(UsuarioRepository usuarioRepository) {
+    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public UsuarioResponseDTO criar(UsuarioRequestDTO dto) {
@@ -29,7 +34,7 @@ public class UsuarioService {
 
         usuario.setNome(dto.getNome());
         usuario.setEmail(dto.getEmail());
-        usuario.setSenha(dto.getSenha());
+        usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
 
         Usuario usuarioSalvo = usuarioRepository.save(usuario);
 
@@ -59,7 +64,7 @@ public class UsuarioService {
 
         usuario.setNome(dto.getNome());
         usuario.setEmail(dto.getEmail());
-        usuario.setSenha(dto.getSenha());
+        usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
 
         Usuario usuarioAtualizado = usuarioRepository.save(usuario);
 

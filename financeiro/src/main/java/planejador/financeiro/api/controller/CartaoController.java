@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import planejador.financeiro.api.dto.CartaoRequestDTO;
 import planejador.financeiro.api.dto.CartaoResponseDTO;
+import planejador.financeiro.security.UsuarioDetailsImpl;
 import planejador.financeiro.service.CartaoService;
 
 import java.util.List;
@@ -34,8 +36,8 @@ public class CartaoController {
     private final CartaoService cartaoService;
 
     @GetMapping
-    public ResponseEntity<List<CartaoResponseDTO>> listar(@RequestParam UUID usuarioId){
-        return ResponseEntity.ok(cartaoService.listarPorUsuario(usuarioId));
+    public ResponseEntity<List<CartaoResponseDTO>> listar(@AuthenticationPrincipal UsuarioDetailsImpl usuarioLogado){
+        return ResponseEntity.ok(cartaoService.listarPorUsuario(usuarioLogado.getUsuario().getId()));
     }
 
     @GetMapping("/{id}")
@@ -52,8 +54,9 @@ public class CartaoController {
     })
     public ResponseEntity<CartaoResponseDTO> criar(
             @Valid @RequestParam CartaoRequestDTO dto,
-            @RequestParam UUID usuarioId
+            @AuthenticationPrincipal UsuarioDetailsImpl usuarioLogado
             ) {
+        UUID usuarioId = usuarioLogado.getUsuario().getId();
         return ResponseEntity.status(HttpStatus.CREATED).body(cartaoService.criar(dto, usuarioId));
     }
 
