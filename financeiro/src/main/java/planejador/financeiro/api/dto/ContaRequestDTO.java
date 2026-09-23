@@ -7,6 +7,7 @@ import lombok.Setter;
 import planejador.financeiro.model.entity.TipoConta;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Getter
 @Setter

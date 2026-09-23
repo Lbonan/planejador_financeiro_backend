@@ -30,7 +30,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/contas")
-@CrossOrigin(origins = "http:localhost:5173")
+@CrossOrigin(origins = "http://localhost:5173")
 @Tag(name = "Contas", description = "Endpoints para gerencimento das contas bancárias dos usuários")
 public class ContaController {
     private final ContaService contaService;
@@ -80,7 +80,7 @@ public class ContaController {
         return ResponseEntity.ok(contaService.atualizarConta(dto, id));
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     @Operation(summary = "Deletar conta", description = "Remove uma conta existente do sistema.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Conta removida com sucesso"),
@@ -90,4 +90,5 @@ public class ContaController {
         contaService.deletarConta(id);
         return ResponseEntity.noContent().build();
     }
+
 }
