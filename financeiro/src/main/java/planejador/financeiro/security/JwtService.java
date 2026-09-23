@@ -6,10 +6,10 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import planejador.financeiro.model.entity.Usuario;
+
 
 import javax.crypto.SecretKey;
-import java.util.Base64;
+
 import java.util.Date;
 import java.util.function.Function;
 

@@ -27,8 +27,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RecursoNaoEncontradoException.class)
     public ResponseEntity<Map<String, Object>> handleNaoEncontrado(RecursoNaoEncontradoException ex){
         Map<String, Object> corpo = corpoBaseEx(HttpStatus.NOT_FOUND, ex.getMessage());
-        return ResponseEntity.badRequest().body(corpo);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(corpo);
     }
+
+
 
     @ExceptionHandler(SaldoInsuficienteException.class)
     public ResponseEntity<Map<String, Object>> handleSaldoInsuficiente(SaldoInsuficienteException ex){
