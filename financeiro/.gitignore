@@ -30,6 +30,7 @@ build/
 !**/src/test/**/build/
 
 .idea/
+.env/
 
 ### VS Code ###
 .vscode/
