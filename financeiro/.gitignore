@@ -31,6 +31,8 @@ build/
 
 .idea/
 .env/
+.env
+.env.*
 
 ### VS Code ###
 .vscode/
