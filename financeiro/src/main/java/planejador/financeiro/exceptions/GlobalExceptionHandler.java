@@ -13,7 +13,12 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // erros validação do @valid
+
+    @ExceptionHandler(ConflitoException.class)
+    public ResponseEntity<Map<String, Object>> handleConflito(ConflitoException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(corpoBaseEx(HttpStatus.CONFLICT, ex.getMessage()));
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidacao(MethodArgumentNotValidException ex){
         Map<String, String> camposComErro = new HashMap<>();
