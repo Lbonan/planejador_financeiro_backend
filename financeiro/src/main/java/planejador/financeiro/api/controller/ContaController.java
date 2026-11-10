@@ -49,21 +49,15 @@ public class ContaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(contaService.criarConta(dto, usuarioId));
     }
 
-    @GetMapping
-    @Operation(summary = "Listar contas do usuário", description = "Retorna todas as contas cadastradas para um usuário específico.")
-    @ApiResponse(responseCode = "200", description = "Lista recuperada com sucesso")
-    public ResponseEntity<List<ContaResponseDTO>> listar(@AuthenticationPrincipal UsuarioDetailsImpl usuarioLogado) {
-        return ResponseEntity.ok(contaService.listarPorUsuario(usuarioLogado.getUsuario().getId()));
-    }
-
     @GetMapping("/{id}")
     @Operation(summary = "Buscar conta por ID", description = "Recupera os detalhes de uma conta específica pelo seu UUID.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Conta encontrada"),
             @ApiResponse(responseCode = "404", description = "Conta não encontrada")
     })
-    public ResponseEntity<ContaResponseDTO> buscar(@PathVariable UUID id) {
-        return ResponseEntity.ok(contaService.buscarPorId(id));
+    public ResponseEntity<ContaResponseDTO> buscar(@PathVariable UUID id,
+                                                   @AuthenticationPrincipal UsuarioDetailsImpl usuarioLogado) {
+        return ResponseEntity.ok(contaService.buscarPorId(id, usuarioLogado.getUsuario().getId()));
     }
 
     @PutMapping("/{id}")
@@ -75,9 +69,10 @@ public class ContaController {
     })
     public ResponseEntity<ContaResponseDTO> atualizar(
             @PathVariable UUID id,
-            @Valid @RequestBody ContaRequestDTO dto
+            @Valid @RequestBody ContaRequestDTO dto,
+            @AuthenticationPrincipal UsuarioDetailsImpl usuarioLogado
     ) {
-        return ResponseEntity.ok(contaService.atualizarConta(dto, id));
+        return ResponseEntity.ok(contaService.atualizarConta(dto, id,  usuarioLogado.getUsuario().getId()));
     }
 
     @DeleteMapping("/{id}")
@@ -86,8 +81,8 @@ public class ContaController {
             @ApiResponse(responseCode = "204", description = "Conta removida com sucesso"),
             @ApiResponse(responseCode = "404", description = "Conta não encontrada")
     })
-    public ResponseEntity<Void> deletar(@PathVariable UUID id) {
-        contaService.deletarConta(id);
+    public ResponseEntity<Void> deletar(@PathVariable UUID id, @AuthenticationPrincipal UsuarioDetailsImpl usuarioLogado) {
+        contaService.deletarConta(id,  usuarioLogado.getUsuario().getId());
         return ResponseEntity.noContent().build();
     }
 

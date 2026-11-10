@@ -3,6 +3,7 @@ package planejador.financeiro.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -21,7 +22,7 @@ public class JwtService {
     @Value("${jwt.expiration}")
     private long expirationMs;
 
-    private SecretKey signingKey() {
+    private SecretKey getSigningKey() {
       return Keys.hmacShaKeyFor(secret.getBytes());
     }
 
@@ -32,7 +33,7 @@ public class JwtService {
                 .subject(email)
                 .issuedAt(agora)
                 .expiration(expiracao)
-                .signWith(signingKey())
+                .signWith(getSigningKey())
                 .compact();
     }
     public String extrairEmail(String token) {
@@ -49,7 +50,7 @@ public class JwtService {
 
     private <T> T extrairClaim(String token, Function<Claims, T> resolver) {
         Claims claims = Jwts.parser()
-                .verifyWith(signingKey())
+                .verifyWith(getSigningKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();

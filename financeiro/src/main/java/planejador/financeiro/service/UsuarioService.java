@@ -5,12 +5,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import planejador.financeiro.api.dto.UsuarioRequestDTO;
 import planejador.financeiro.api.dto.UsuarioResponseDTO;
-import planejador.financeiro.exceptions.ConflitoException;
 import planejador.financeiro.exceptions.RecursoNaoEncontradoException;
 import planejador.financeiro.model.entity.Usuario;
 import planejador.financeiro.model.repository.UsuarioRepository;
 
-import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,11 +25,12 @@ public class UsuarioService {
     }
 
     public UsuarioResponseDTO criar(UsuarioRequestDTO dto) {
-        Usuario usuario = new Usuario();
-        if (!usuario.getEmail().equalsIgnoreCase(dto.getEmail())
-                && usuarioRepository.existsByEmail(dto.getEmail())) {
-            throw new ConflitoException("Já existe um usuário cadastrado com esse e-mail.");
+
+        if (usuarioRepository.existsByEmail(dto.getEmail())) {
+            throw new RuntimeException("Já existe um usuário cadastrado com esse e-mail.");
         }
+
+        Usuario usuario = new Usuario();
 
         usuario.setNome(dto.getNome());
         usuario.setEmail(dto.getEmail());
@@ -61,10 +60,7 @@ public class UsuarioService {
     public UsuarioResponseDTO atualizar(UUID id, UsuarioRequestDTO dto) {
 
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new ConflitoException("Usuário não encontrado."));
-        if (!usuario.getEmail().equalsIgnoreCase(dto.getEmail()) && usuarioRepository.existsByEmail(dto.getEmail())){
-            throw new ConflitoException("Já existe um usuário cadastrado com esse e-mail.");
-        }
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado."));
 
         usuario.setNome(dto.getNome());
         usuario.setEmail(dto.getEmail());

@@ -37,37 +37,27 @@ public class ContaService {
 
     }
 
-    public List<ContaResponseDTO> listarPorUsuario(UUID usuarioId){
-        return contaRepository.findByUsuarioId(usuarioId).stream()
-                .map(this::toResponseDTO)
-                .collect(Collectors.toList());
+    private Conta buscarUsuario(UUID id,  UUID usuarioId){
+        return contaRepository.findByUsuarioId(id, usuarioId)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Conta com id " + id + " não encontrada"));
     }
 
-    public ContaResponseDTO buscarPorId(UUID id) {
-        Conta conta = contaRepository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Conta com id " + id + "não encontrado"));
-        return new ContaResponseDTO(conta);
+    public ContaResponseDTO buscarPorId(UUID id,  UUID usuarioId){
+        return new ContaResponseDTO(buscarUsuario(id, usuarioId));
     }
 
-
-    public ContaResponseDTO atualizarConta(ContaRequestDTO dto, UUID id){
-        Conta conta = contaRepository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Conta com id" + id + "não encontrado"));
-
+    public ContaResponseDTO atualizarConta(ContaRequestDTO dto, UUID id, UUID usuarioId) {
+        Conta conta = buscarUsuario(id, usuarioId);
         conta.setNome(dto.getNome());
         conta.setBanco(dto.getBanco());
         conta.setTipoConta(dto.getTipoConta());
         conta.setSaldo(dto.getSaldo());
-
-        Conta atualizada = contaRepository.save(conta);
-        return toResponseDTO(atualizada);
+        return toResponseDTO(contaRepository.save(conta));
     }
 
-    public void deletarConta(UUID id){
-        if(!contaRepository.existsById(id)){
-            throw new RecursoNaoEncontradoException("Conta com id " + id + "não encontrado");
-        }
-        contaRepository.deleteById(id);
+
+    public void deletarConta(UUID id, UUID usuarioId) {
+        contaRepository.delete(buscarUsuario(id, usuarioId));
     }
 
     private ContaResponseDTO toResponseDTO(Conta conta){
