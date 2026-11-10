@@ -9,6 +9,6 @@ import java.util.UUID;
 
 @Repository
 public interface ContaRepository extends JpaRepository<Conta, UUID> {
-    Optional<Conta> findByUsuarioId(UUID id, UUID usuarioId);
-    boolean existsByUsuarioId(UUID id, UUID usuarioId);
+    Optional<Conta> findByIdAndUsuarioId(UUID id, UUID usuarioId);
+    boolean existsByIdAndUsuarioId(UUID id, UUID usuarioId);
 }

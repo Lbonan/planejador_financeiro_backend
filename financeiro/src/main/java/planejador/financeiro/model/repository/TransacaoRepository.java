@@ -7,10 +7,14 @@ import org.springframework.stereotype.Repository;
 import planejador.financeiro.model.entity.Transacao;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface TransacaoRepository extends JpaRepository<Transacao, UUID> {
+
+    @Query("SELECT t FROM Transacao t WHERE t.idTransacao = :id AND t.conta.usuario.id = :usuarioId")
+    Optional<Transacao> buscarPorIdEUsuario(@Param("id") UUID id, @Param("usuarioId") UUID usuarioId);
 
     @Query("SELECT t FROM Transacao t WHERE t.conta.id = :contaId ORDER BY t.data DESC")
     List<Transacao> listarPorContaId(@Param("contaId") UUID contaId);
@@ -18,4 +22,5 @@ public interface TransacaoRepository extends JpaRepository<Transacao, UUID> {
 
     @Query("SELECT t FROM Transacao t WHERE t.conta.usuario.id = :usuarioId ORDER BY t.data DESC")
     List<Transacao> listarPorUsuarioId(@Param("usuarioId") UUID usuarioId);
+
 }
