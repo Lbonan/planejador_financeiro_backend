@@ -4,8 +4,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import planejador.financeiro.model.entity.Meta;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface MetaRepository extends JpaRepository<Meta, UUID> {
+
     List<Meta> findByUsuarioId(UUID usuarioId);
+
+    Optional<Meta> findByMetaIdAndUsuarioId(UUID metaId, UUID usuarioId);
 }

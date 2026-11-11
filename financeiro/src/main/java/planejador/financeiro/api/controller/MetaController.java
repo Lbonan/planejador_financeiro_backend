@@ -7,11 +7,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import planejador.financeiro.api.dto.MetaRequestDTO;
 import planejador.financeiro.api.dto.MetaResponseDTO;
+import planejador.financeiro.security.UsuarioDetailsImpl;
 import planejador.financeiro.service.MetaService;
 
 import java.math.BigDecimal;
@@ -21,43 +23,40 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/metas")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:5173")
 @Tag(name = "Metas", description = "Endpoints para gerenciamento de metas financeiras")
 public class MetaController {
 
     private final MetaService metaService;
 
-    @GetMapping("/usuario/{usuarioId}")
-    @Operation(summary = "Listar metas por usuário", description = "Retorna todas as metas de um usuário específico.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
-    })
-    public ResponseEntity<List<MetaResponseDTO>> listarPorUsuario(@PathVariable UUID usuarioId) {
-        List<MetaResponseDTO> metas = metaService.listarPorUsuario(usuarioId);
-        return ResponseEntity.ok(metas);
+    @GetMapping
+    @Operation(summary = "Listar metas do usuário autenticado", description = "Retorna todas as metas do usuário logado.")
+    public ResponseEntity<List<MetaResponseDTO>> listarDoUsuario(
+            @AuthenticationPrincipal UsuarioDetailsImpl usuarioLogado) {
+        return ResponseEntity.ok(metaService.listarDoUsuario(usuarioLogado.getUsuario().getId()));
     }
 
     @GetMapping("/{metaId}")
-    @Operation(summary = "Buscar meta por ID", description = "Recupera os detalhes de uma meta específica.")
+    @Operation(summary = "Buscar meta por ID", description = "Recupera os detalhes de uma meta do usuário logado.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Meta encontrada"),
             @ApiResponse(responseCode = "404", description = "Meta não encontrada")
     })
-    public ResponseEntity<MetaResponseDTO> buscarPorId(@PathVariable UUID metaId) {
-        MetaResponseDTO meta = metaService.buscarPorId(metaId);
-        return ResponseEntity.ok(meta);
+    public ResponseEntity<MetaResponseDTO> buscarPorId(
+            @PathVariable UUID metaId,
+            @AuthenticationPrincipal UsuarioDetailsImpl usuarioLogado) {
+        return ResponseEntity.ok(metaService.buscarPorId(metaId, usuarioLogado.getUsuario().getId()));
     }
 
     @PostMapping
-    @Operation(summary = "Criar meta", description = "Cadastra uma nova meta financeira vinculada a um usuário.")
+    @Operation(summary = "Criar meta", description = "Cadastra uma nova meta financeira para o usuário logado.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Meta criada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados da requisição inválidos"),
-            @ApiResponse(responseCode = "404", description = "Usuário informado não foi encontrado")
+            @ApiResponse(responseCode = "400", description = "Dados da requisição inválidos")
     })
-    public ResponseEntity<MetaResponseDTO> criar(@RequestBody @Valid MetaRequestDTO dto) {
-        MetaResponseDTO novaMeta = metaService.criar(dto);
+    public ResponseEntity<MetaResponseDTO> criar(
+            @RequestBody @Valid MetaRequestDTO dto,
+            @AuthenticationPrincipal UsuarioDetailsImpl usuarioLogado) {
+        MetaResponseDTO novaMeta = metaService.criar(dto, usuarioLogado.getUsuario().getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(novaMeta);
     }
 
@@ -70,19 +69,22 @@ public class MetaController {
     })
     public ResponseEntity<MetaResponseDTO> adicionarAporte(
             @PathVariable UUID metaId,
-            @RequestParam @Positive(message = "O valor deve ser positivo") BigDecimal valor) {
-        MetaResponseDTO metaAtualizada = metaService.adicionarProgresso(metaId, valor);
-        return ResponseEntity.ok(metaAtualizada);
+            @RequestParam @Positive(message = "O valor deve ser positivo") BigDecimal valor,
+            @AuthenticationPrincipal UsuarioDetailsImpl usuarioLogado) {
+        return ResponseEntity.ok(
+                metaService.adicionarProgresso(metaId, usuarioLogado.getUsuario().getId(), valor));
     }
 
     @DeleteMapping("/{metaId}")
-    @Operation(summary = "Deletar meta", description = "Exclui uma meta existente.")
+    @Operation(summary = "Deletar meta", description = "Exclui uma meta do usuário logado.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Meta removida com sucesso"),
             @ApiResponse(responseCode = "404", description = "Meta não encontrada")
     })
-    public ResponseEntity<Void> deletar(@PathVariable UUID metaId) {
-        metaService.deletar(metaId);
+    public ResponseEntity<Void> deletar(
+            @PathVariable UUID metaId,
+            @AuthenticationPrincipal UsuarioDetailsImpl usuarioLogado) {
+        metaService.deletar(metaId, usuarioLogado.getUsuario().getId());
         return ResponseEntity.noContent().build();
     }
 }

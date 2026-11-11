@@ -7,9 +7,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import planejador.financeiro.api.dto.UsuarioRequestDTO;
 import planejador.financeiro.api.dto.UsuarioResponseDTO;
+import planejador.financeiro.security.UsuarioDetailsImpl;
 import planejador.financeiro.service.UsuarioService;
 
 import java.util.List;
@@ -46,15 +48,9 @@ public class UsuarioController {
                 .body(usuario);
     }
 
-    @GetMapping
-    @Operation(
-            summary = "Listar todos os usuários",
-            description = "Retorna a lista completa com todos os usuários cadastrados."
-    )
-    @ApiResponse(responseCode = "200", description = "Lista recuperada com sucesso")
-    public ResponseEntity<List<UsuarioResponseDTO>> listarTodos() {
-
-        return ResponseEntity.ok(usuarioService.listarTodos());
+    @GetMapping("/me")
+    public ResponseEntity<UsuarioResponseDTO> me(@AuthenticationPrincipal UsuarioDetailsImpl logado) {
+        return ResponseEntity.ok(usuarioService.buscarPorId(logado.getUsuario().getId()));
     }
 
     @GetMapping("/{id}")
@@ -72,7 +68,7 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.buscarPorId(id));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/me")
     @Operation(
             summary = "Atualizar usuário",
             description = "Atualiza os dados de um usuário existente com base no seu UUID."
@@ -89,7 +85,7 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.atualizar(id, dto));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/me")
     @Operation(
             summary = "Excluir usuário",
             description = "Remove permanentemente um usuário do sistema através do seu UUID."

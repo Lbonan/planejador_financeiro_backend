@@ -22,25 +22,20 @@ public class MetaService {
     private final MetaRepository metaRepository;
     private final UsuarioRepository usuarioRepository;
 
-    public List<MetaResponseDTO> listarPorUsuario(UUID usuarioId) {
-        if (!usuarioRepository.existsById(usuarioId)) {
-            throw new RecursoNaoEncontradoException("Usuário não encontrado com ID: " + usuarioId);
-        }
+    public List<MetaResponseDTO> listarDoUsuario(UUID usuarioId) {
         return metaRepository.findByUsuarioId(usuarioId)
                 .stream()
                 .map(MetaResponseDTO::new)
                 .toList();
     }
 
-    public MetaResponseDTO buscarPorId(UUID metaId) {
-        Meta meta = metaRepository.findById(metaId)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Meta não encontrada com ID: " + metaId));
-        return new MetaResponseDTO(meta);
+    public MetaResponseDTO buscarPorId(UUID metaId, UUID usuarioId) {
+        return new MetaResponseDTO(buscarDoUsuario(metaId, usuarioId));
     }
 
-    public MetaResponseDTO criar(MetaRequestDTO dto) {
-        Usuario usuario = usuarioRepository.findById(dto.getUsuarioId())
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado com ID: " + dto.getUsuarioId()));
+    public MetaResponseDTO criar(MetaRequestDTO dto, UUID usuarioId) {
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado."));
 
         Meta meta = new Meta();
         meta.setNome(dto.getNome());
@@ -53,20 +48,18 @@ public class MetaService {
             meta.setStatusMeta(StatusMeta.CONCLUIDA);
         }
 
-        Meta metaSalva = metaRepository.save(meta);
-        return new MetaResponseDTO(metaSalva);
+        return new MetaResponseDTO(metaRepository.save(meta));
     }
 
-    public MetaResponseDTO adicionarProgresso(UUID metaId, BigDecimal valorAporte) {
+    public MetaResponseDTO adicionarProgresso(UUID metaId, UUID usuarioId, BigDecimal valorAporte) {
         if (valorAporte == null || valorAporte.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("O valor do aporte deve ser positivo.");
         }
 
-        Meta meta = metaRepository.findById(metaId)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Meta não encontrada com ID: " + metaId));
+        Meta meta = buscarDoUsuario(metaId, usuarioId);
 
         if (meta.getStatusMeta() != StatusMeta.EM_ANDAMENTO) {
-            throw new IllegalStateException("Aportes só podem ser feitos em metas com status EM_ANDAMENTO.");
+            throw new IllegalArgumentException("Aportes só podem ser feitos em metas com status EM_ANDAMENTO.");
         }
 
         BigDecimal novoValor = meta.getValorAtual().add(valorAporte);
@@ -76,14 +69,15 @@ public class MetaService {
             meta.setStatusMeta(StatusMeta.CONCLUIDA);
         }
 
-        Meta metaAtualizada = metaRepository.save(meta);
-        return new MetaResponseDTO(metaAtualizada);
+        return new MetaResponseDTO(metaRepository.save(meta));
     }
 
-    public void deletar(UUID metaId) {
-        if (!metaRepository.existsById(metaId)) {
-            throw new RecursoNaoEncontradoException("Meta não encontrada com ID: " + metaId);
-        }
-        metaRepository.deleteById(metaId);
+    public void deletar(UUID metaId, UUID usuarioId) {
+        metaRepository.delete(buscarDoUsuario(metaId, usuarioId));
+    }
+
+    private Meta buscarDoUsuario(UUID metaId, UUID usuarioId) {
+        return metaRepository.findByMetaIdAndUsuarioId(metaId, usuarioId)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Meta não encontrada com ID: " + metaId));
     }
 }
